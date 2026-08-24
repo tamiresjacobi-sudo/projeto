@@ -1,38 +1,189 @@
-<!DOCTYPE html>
-<html lang='pt-br'>
-    <head>
-        <meta charset="UTF-8">
-        <meta name="viewport"
-        content="width=device-width, initial-scale=1.0">
-        <titule>blog</title>
-        <style>
-           header{
-                background-color: #183C63;
-                color: #FFFFFF;
-                text-align: center;
-                max-width: 800px; 
-                margin: 0 auto; 
-                padding: 16px;
-           }
-           main{
-                background-color: #FFFFFF;
-                color: #183C63;
-                max-width: 800px;
-                margin: 0 auto;
-                padding: 16px;
-           }
-        </style>        
-    </head>
-    <body>
-        <header>
+ <!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Curtidas</title>
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
 
-            <h1>meu blog tech</h1>
-            <p>vou compartilhar conecimento sobre tecnologia e programação</p>
-        </header>
-        <main>
-            <img src="" alt="">
-            <h2>meu primeiro post</h2>
-            <p>por:tamiresjacobi</p>
-            <p>boas-vindas ao meu blog! aqui vou compartilhar dicas de programacao e curiosidades da área de tecnologia.</p>
-        </body>
-    </html>        
+        body {
+            background-color: #f0f2f5;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+
+        .card {
+            background: white;
+            padding: 25px;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            text-align: center;
+            max-width: 400px;
+            width: 100%;
+        }
+
+        h2 {
+            color: #333;
+            margin-bottom: 10px;
+        }
+
+        p {
+            color: #666;
+            margin-bottom: 20px;
+            font-size: 14px;
+        }
+
+        .buttons-container {
+            display: flex;
+            justify-content: center;
+            gap: 20px;
+        }
+
+        .btn {
+            border: none;
+            padding: 10px 20px;
+            font-size: 16px;
+            font-weight: bold;
+            border-radius: 20px;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-like {
+            background-color: #e7f3ff;
+            color: #1877f2;
+        }
+
+        .btn-like:hover {
+            background-color: #dbeafe;
+        }
+
+        .btn-like.active {
+            background-color: #1877f2;
+            color: white;
+        }
+
+        .btn-dislike {
+            background-color: #ffebe9;
+            color: #e41e3f;
+        }
+
+        .btn-dislike:hover {
+            background-color: #ffdad6;
+        }
+
+        .btn-dislike.active {
+            background-color: #e41e3f;
+            color: white;
+        }
+
+        .count {
+            font-size: 14px;
+            opacity: 0.9;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="card">
+        <h2>Publicação Incrível</h2>
+        <p>Este é um exemplo de postagem onde os usuários podem expressar suas reações clicando nos botões abaixo.</p>
+        
+        <div class="buttons-container">
+            <!-- Botão de Curtir -->
+            <button id="likeBtn" class="btn btn-like">
+                👍 <span class="count" id="likeCount">0</span>
+            </button>
+
+            <!-- Botão de Descurtir -->
+            <button id="dislikeBtn" class="btn btn-dislike">
+                👎 <span class="count" id="dislikeCount">0</span>
+            </button>
+        </div>
+    </div>
+
+    <script>
+        // Seleção dos elementos do HTML
+        const likeBtn = document.getElementById('likeBtn');
+        const dislikeBtn = document.getElementById('dislikeBtn');
+        const likeCountEl = document.getElementById('likeCount');
+        const dislikeCountEl = document.getElementById('dislikeCount');
+
+        // Carrega os valores salvos no localStorage (ou começa com zero se não existir)
+        let likes = parseInt(localStorage.getItem('likes')) || 0;
+        let dislikes = parseInt(localStorage.getItem('dislikes')) || 0;
+        let userVote = localStorage.getItem('userVote') || null; // 'like', 'dislike' ou null
+
+        // Função para atualizar a tela e salvar os dados
+        function updateUI() {
+            likeCountEl.textContent = likes;
+            dislikeCountEl.textContent = dislikes;
+
+            // Remove classes ativas de ambos
+            likeBtn.classList.remove('active');
+            dislikeBtn.classList.remove('active');
+
+            // Aplica a classe ativa baseada no voto atual do usuário
+            if (userVote === 'like') {
+                likeBtn.classList.add('active');
+            } else if (userVote === 'dislike') {
+                dislikeBtn.classList.add('active');
+            }
+
+            // Salva o estado atual no navegador do usuário
+            localStorage.setItem('likes', likes);
+            localStorage.setItem('dislikes', dislikes);
+            localStorage.setItem('userVote', userVote || '');
+        }
+
+        // Evento de clique no botão Curtir
+        likeBtn.addEventListener('click', () => {
+            if (userVote === 'like') {
+                // Se já tinha curtido, remove o voto
+                likes--;
+                userVote = null;
+            } else {
+                // Se tinha descurtido antes, remove o descurtir primeiro
+                if (userVote === 'dislike') {
+                    dislikes--;
+                }
+                likes++;
+                userVote = 'like';
+            }
+            updateUI();
+        });
+
+        // Evento de clique no botão Descurtir
+        dislikeBtn.addEventListener('click', () => {
+            if (userVote === 'dislike') {
+                // Se já tinha descurtido, remove o voto
+                dislikes--;
+                userVote = null;
+            } else {
+                // Se tinha curtido antes, remove o curtir primeiro
+                if (userVote === 'like') {
+                    likes--;
+                }
+                dislikes++;
+                userVote = 'dislike';
+            }
+            updateUI();
+        });
+
+        // Inicializa a tela com os dados salvos
+        updateUI();
+    </script>
+
+</body>
+</html>
